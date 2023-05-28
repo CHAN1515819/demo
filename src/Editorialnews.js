@@ -1,45 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 
-const EditorialNewsCard = () => {
-  const [editorialData, setEditorialData] = useState(null);
+const API_KEY = 'b1e8e39f1bc244a3aa380fdc4d2c7846';
+
+const ArticleList = () => {
+  const [articles, setArticles] = useState([]);
 
   useEffect(() => {
-    const fetchEditorialNews = async () => {
-      const options = {
-        method: 'GET',
-        url: 'https://the-hindu-national-news.p.rapidapi.com/news/23',
-        headers: {
-          'X-RapidAPI-Key': 'bd2bcc28b5msh8de10d333394aa3p1a3d06jsn36ca4c05ccea',
-          'X-RapidAPI-Host': 'the-hindu-national-news.p.rapidapi.com'
-        }
-      };
-
-      try {
-        const response = await axios.request(options);
-        setEditorialData(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchEditorialNews();
+    fetchArticles();
   }, []);
+
+  const fetchArticles = async () => {
+    try {
+      const response = await fetch(
+        `https://newsapi.org/v2/everything?q=newspaper&apiKey=${API_KEY}`
+      );
+      const data = await response.json();
+      setArticles(data.articles);
+    } catch (error) {
+      console.error('Error fetching articles:', error);
+    }
+  };
 
   return (
     <div>
-      <h1>Editorial News</h1>
-      {editorialData ? (
-        <div className="card">
-          <h2>{editorialData.title}</h2>
-          <p>{editorialData.content}</p>
+      <h1>Latest News Articles</h1>
+      {articles.map((article, index) => (
+        <div key={index}>
+          <h2>{article.title}</h2>
+          <p>{article.description}</p>
+          <a href={article.url} target="_blank" rel="noopener noreferrer">
+            Read more
+          </a>
         </div>
-      ) : (
-        <p>Loading...</p>
-      )}
+      ))}
     </div>
   );
 };
 
-export default EditorialNewsCard;
+export default ArticleList;
+
 
